@@ -8,6 +8,8 @@ function generateRandomString(){
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended: true}));
 
+///DATA///
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -19,9 +21,21 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+///ADD///
+
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  const id = generateRandomString();
+  urlDatabase[id] = req.body.longURL;
+  res.redirect(`/urls/${id}`); 
+});
 
 
 ///READ///
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 app.get("/u/:id", (req, res) =>{
   const id = req.params.id;
   const longURL = urlDatabase[id];
@@ -30,10 +44,11 @@ app.get("/u/:id", (req, res) =>{
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  console.log(id);
-  const templateVars = {id: id, longURL: url.Database.id};
+  const templateVars = {id: id, longURL: urlDatabase.id};
   res.render("urls_show", templateVars);
 });
+
+
 
 app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase};
@@ -44,18 +59,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
 
-///ADD///
-
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  const id = generateRandomString();
-  urlDatabase[id] = req.body.longURL;
-  res.redirect(`/urls/${id}`); 
-});
 
 ///DELETE//
 app.post("/urls/:id/delete", (req, res) => {
