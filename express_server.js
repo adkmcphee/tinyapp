@@ -36,10 +36,14 @@ app.get("/urls.json", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  res.send(generateRandomString()); // Respond with 'Ok' (we will replace this)
 });
 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+function generateRandomString(){
+ return Math.random().toString(36).substring(2,8);
+};
