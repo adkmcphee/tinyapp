@@ -19,6 +19,9 @@
       </div>
       
     </div>
+    <% if (username) { %>
+      <a class="nav-item nav-link">Logged in as <%= username %></a>
+    <% }  else {%>
     <form method="POST", action="/login" >
             <input
               type="text"
@@ -28,6 +31,6 @@
     <button type="submit" class="btn btn-primary">Login</button>
 
     </form> 
-      
+     <% } %> 
   </nav>
 </header>
