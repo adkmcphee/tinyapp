@@ -30,6 +30,12 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`); 
 });
 
+app.post("/login", (req, res) => {
+  const loginID = req.body.login
+  console.log(loginID)
+  res.cookie('username', loginID)
+  res.redirect('/urls/'); 
+})
 
 ///READ///
 app.get("/urls/new", (req, res) => {
