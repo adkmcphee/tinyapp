@@ -23,23 +23,33 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+/////////
 ///ADD///
-
+/////////
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   res.redirect(`/urls/${id}`); 
 });
-
+///Login\\\
 app.post("/login", (req, res) => {
   const loginID = req.body.login
   res.cookie('username', loginID)
   res.redirect('/urls/'); 
 })
+///Logout\\\
 app.post("/logout", (req, res) => {
   res.clearCookie('username')
   res.redirect('/urls/'); 
+})
+
+///Registration\\\
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("register", templateVars); 
 })
 
 ///READ///
