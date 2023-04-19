@@ -56,14 +56,30 @@ app.post("/urls", (req, res) => {
 });
 ///Login\\\
 app.post("/login", (req, res) => {
-  ///below may cause bug for now...///
+  const email = req.body.email;
+  const password = req.body.password;
 
-  res.redirect('/login');
+   //if email address is located, but passwords don't match, return response with 403 status code.
+  let foundUser = getUserByEmail(email);
+
+  if (!foundUser) {
+    return res.status(403).send('no user with that email found');
+  }
+
+  if (foundUser.password !== password) {
+    return res.status(403).send('Incorrect password');
+  }
+  
+  //if both pass, set user_id cookie with matching user's random id and redirect to /urls
+
+  res.cookie("user_id", foundUser.id);
+  res.redirect('/urls');
 });
+
 ///Logout\\\
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls/');
+  res.redirect('/login');
 });
 
 ///Registration\\\
