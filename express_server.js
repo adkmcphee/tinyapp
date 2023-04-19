@@ -40,7 +40,10 @@ app.post("/login", (req, res) => {
 
 ///READ///
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 ///redirect to website
