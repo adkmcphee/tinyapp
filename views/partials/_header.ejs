@@ -19,9 +19,9 @@
       </div>
       
     </div>
-    <% if (username) { %>
+    <% if (user) { %>
       <form method="POST", action="/logout" >
-      <a class="nav-item"> <%= username %></a>
+      <a class="nav-item"> <%= user.email %></a>
       <button type="submit" class="btn btn-primary" action="/logout">Logout</button>
       </form>
     <% }  else {%>
