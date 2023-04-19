@@ -1,13 +1,23 @@
 const express = require("express");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
-function generateRandomString(){
- return Math.random().toString(36).substring(2,8);
+function generateRandomString() {
+  return Math.random().toString(36).substring(2, 8);
 };
 
+function getUserByEmail(email) {
+  for (const userID in users) {
+    const user = users[userID];
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return null;
+}
+
 app.set("view engine", "ejs");
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 ///DATA///
@@ -42,51 +52,70 @@ app.get("/", (req, res) => {
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
-  res.redirect(`/urls/${id}`); 
+  res.redirect(`/urls/${id}`);
 });
 ///Login\\\
 app.post("/login", (req, res) => {
   ///below may cause bug for now...///
-  const loginID = req.body.login
-  res.cookie('user_id', loginID)
-  res.redirect('/urls/'); 
-})
+
+  res.redirect('/login');
+});
 ///Logout\\\
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id')
-  res.redirect('/urls/'); 
-})
+  res.clearCookie('user_id');
+  res.redirect('/urls/');
+});
 
 ///Registration\\\
 app.get("/register", (req, res) => {
-  const userID = req.cookies["user_id"]
+  const userID = req.cookies["user_id"];
 
   const templateVars = {
     user: users[userID],
   };
-  res.render("register", templateVars); 
-})
+  res.render("register", templateVars);
+});
 
 ///Registration POST\\\
 app.post("/register", (req, res) => {
   let id = generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
+
+  //if email or password are empty strings. Send back a res with 400 status code.
+  if (!email || !password) {
+    return res.status(400).send('Please fill out both fields properly.');
+  }
+  //if email already exists, send back res with 400 status code.
+  if (getUserByEmail(email)) {
+    return res.status(400).send('Sorry, that email is already in use.');
+  };
+
   users[id] = {
     id: id,
     email: email,
     password: password
-  }
-  res.cookie("user_id", users[id].id)
-  res.redirect('/urls')
+  };
+  res.cookie("user_id", users[id].id);
+  res.redirect('/urls');
 
 });
 
 //////////
 ///READ///
 //////////
+
+app.get("/login", (req, res) => {
+
+  const userID = req.cookies["user_id"];
+  const templateVars = {
+    user: users[userID],
+  };
+  res.render("login", templateVars);
+});
+
 app.get("/urls/new", (req, res) => {
-  const userID = req.cookies["user_id"]
+  const userID = req.cookies["user_id"];
 
   const templateVars = {
     user: users[userID],
@@ -94,17 +123,17 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/u/:id", (req, res) =>{
+app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
   res.redirect(longURL);
-})
+});
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const userID = req.cookies["user_id"]
+  const userID = req.cookies["user_id"];
   const templateVars = {
-    id: id, 
+    id: id,
     longURL: urlDatabase[id],
     user: users[userID]
   };
@@ -112,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"]
+  const userID = req.cookies["user_id"];
   const templateVars = {
     urls: urlDatabase,
     user: users[userID]
@@ -128,29 +157,29 @@ app.get("/urls.json", (req, res) => {
 //////////
 ///EDIT///
 //////////
-app.post("/urls/:id", (req,res) =>{
-  const longURL = req.body.longURL
-  const id = req.params.id
+app.post("/urls/:id", (req, res) => {
+  const longURL = req.body.longURL;
+  const id = req.params.id;
 
   urlDatabase[id] = longURL;
   console.log(urlDatabase);
-  
-  res.redirect("/urls");
-})
 
-app.post("/urls/:id/edit", (req,res) =>{
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
-res.redirect(`/urls/${id}`)
-})
+  res.redirect(`/urls/${id}`);
+});
 
 ///////////
 ///DELETE//
 ///////////
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-  delete(urlDatabase[id]);
-  
-  res.redirect(`/urls/`); 
+  delete (urlDatabase[id]);
+
+  res.redirect(`/urls/`);
 });
 
 
