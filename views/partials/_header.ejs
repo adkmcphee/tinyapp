@@ -20,7 +20,10 @@
       
     </div>
     <% if (username) { %>
-      <a class="nav-item nav-link">Logged in as <%= username %></a>
+      <form method="POST", action="/logout" >
+      <a class="nav-item"> <%= username %></a>
+      <button type="submit" class="btn btn-primary" action="/logout">Logout</button>
+      </form>
     <% }  else {%>
     <form method="POST", action="/login" >
             <input
