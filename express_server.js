@@ -1,3 +1,5 @@
+const {getUserByEmail} = require("./helpers")
+
 const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
@@ -8,15 +10,6 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 };
 
-function getUserByEmail(email) {
-  for (const userID in users) {
-    const user = users[userID];
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
-}
 
 function urlsForUser(id) {
   let userUrlDatabase = {};
@@ -96,7 +89,7 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   //if email address is located, but passwords don't match, return response with 403 status code.
-  let foundUser = getUserByEmail(email);
+  let foundUser = getUserByEmail(email, users);
 
   if (!foundUser) {
     return res.status(403).send('no user with that email found');
@@ -143,7 +136,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Please fill out both fields properly.');
   }
   //if email already exists, send back res with 400 status code.
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(400).send('Sorry, that email is already in use.');
   };
 
