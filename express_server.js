@@ -52,6 +52,13 @@ app.get("/", (req, res) => {
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
+  const userID = req.cookies["user_id"];
+
+  if (!userID){
+    return res.send('Must be logged in to see this page')
+  }
+
+
   res.redirect(`/urls/${id}`);
 });
 ///Login\\\
@@ -85,6 +92,10 @@ app.post("/logout", (req, res) => {
 ///Registration\\\
 app.get("/register", (req, res) => {
   const userID = req.cookies["user_id"];
+
+  if (userID){
+    return res.redirect('/urls')
+  }
 
   const templateVars = {
     user: users[userID],
@@ -124,6 +135,11 @@ app.post("/register", (req, res) => {
 app.get("/login", (req, res) => {
 
   const userID = req.cookies["user_id"];
+
+  if (userID){
+    return res.redirect('/urls')
+  }
+
   const templateVars = {
     user: users[userID],
   };
@@ -132,6 +148,10 @@ app.get("/login", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const userID = req.cookies["user_id"];
+
+  if (!userID){
+    return res.redirect('/login')
+  }
 
   const templateVars = {
     user: users[userID],
@@ -142,6 +162,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
+
+  if (!longURL){
+    res.status(404).send('Error: ID does not exist')
+  }
+
   res.redirect(longURL);
 });
 
