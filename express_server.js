@@ -1,4 +1,4 @@
-const {getUserByEmail} = require("./helpers")
+const { getUserByEmail } = require("./helpers");
 
 const express = require("express");
 const morgan = require('morgan');
@@ -19,7 +19,7 @@ function urlsForUser(id) {
     }
   }
   return userUrlDatabase;
-}
+};
 
 app.set("view engine", "ejs");
 
@@ -30,31 +30,13 @@ app.use(cookieSession({
   name: 'my-cookie',
   keys: ['kasdhfkahsdkf']
 }));
+
 ///DATA///
 
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
+const urlDatabase = {};
 
-let users = {
-  abc: {
-    id: "abc",
-    email: "a@a.com",
-    password: "1234",
-  },
-  def: {
-    id: "def",
-    email: "b@b.com",
-    password: "asdf",
-  },
-};
+let users = {};
+
 ////////////
 ////BROWSE//
 ////////////
@@ -69,19 +51,17 @@ app.post("/urls", (req, res) => {
   const id = generateRandomString();
   const userID = req.session.userID;
   console.log(req.body.longURL);
-  
+
   if (!userID) {
-    return res.send('Must be logged in to see this page');
+    return res.status(401).send('Error 401! Must be logged in to see this page.');
   }
 
   urlDatabase[id] = {
     longURL: req.body.longURL,
     userID: userID
   };
-
-
-
   res.redirect(`/urls/${id}`);
+
 });
 ///Login\\\
 app.post("/login", (req, res) => {
@@ -92,12 +72,12 @@ app.post("/login", (req, res) => {
   let foundUser = getUserByEmail(email, users);
 
   if (!foundUser) {
-    return res.status(403).send('no user with that email found');
-  }
+    return res.status(403).send('Error 403! No user with that email found.');
+  };
 
   if (!bcrypt.compareSync(password, foundUser.password)) {
-      return res.status(400).send('passwords do not match');
-    }
+    return res.status(400).send('Error 404! Incorrect password.');
+  };
 
   //if both pass, set user_id cookie with matching user's random id and redirect to /urls
 
@@ -133,16 +113,16 @@ app.post("/register", (req, res) => {
 
   //if email or password are empty strings. Send back a res with 400 status code.
   if (!email || !password) {
-    return res.status(400).send('Please fill out both fields properly.');
+    return res.status(400).send('Error 400! Please fill out both fields properly.');
   }
   //if email already exists, send back res with 400 status code.
   if (getUserByEmail(email, users)) {
-    return res.status(400).send('Sorry, that email is already in use.');
+    return res.status(400).send('Error 400! That email is already in use.');
   };
 
-  const hash = bcrypt.hashSync(password, 10)
+  const hash = bcrypt.hashSync(password, 10);
 
-  newUser = {
+  let newUser = {
     id: id,
     email: email,
     password: hash
@@ -194,7 +174,7 @@ app.get("/u/:id", (req, res) => {
   const id = req.params.id;
 
   if (!urlDatabase[id]) {
-    return res.status(404).send('Error: URL does not exist');
+    return res.status(404).send('Error 404! URL does not exist.');
   }
 
   res.redirect(urlDatabase[id].longURL);
@@ -205,16 +185,16 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.userID;
 
   if (!userID) {
-    return res.send('Please log in.');
+    return res.status(401).send('Error 401! Please log in.');
   }
 
   if (!urlDatabase[id]) {
-    return res.status(404).send('Error: URL does not exist');
+    return res.status(404).send('Error 404! URL does not exist.');
   }
 
 
   if (urlDatabase[id].userID !== userID) {
-    return res.send('You do not have access to this link');
+    return res.status(401).send('Error 401! You do not have access to this link.');
   }
 
   const templateVars = {
@@ -231,10 +211,10 @@ app.get("/urls", (req, res) => {
   const userID = req.session.userID;
 
   if (!userID) {
-    return res.send('Please register or log in.');
+    return res.status(400).send(`Error 400! Please <a href="http://localhost:8080/register">register</a> or <a href="http://localhost:8080/login">log in</a>.`);
   }
   let urlDatabase = urlsForUser(userID);
-  
+
   const templateVars = {
     urls: urlDatabase,
     user: users[userID]
@@ -263,16 +243,16 @@ app.post("/urls/:id", (req, res) => {
 
 
   if (!userID) {
-    return res.send('Please log in.');
+    return res.status(400).send('Error 400! Please register or log in.');
   }
 
 
   if (!urlDatabase[id]) {
-    return res.status(404).send('Error: URL does not exist');
+    return res.status(404).send('Error 404! URL does not exist.');
   }
 
   if (urlDatabase[id].userID !== userID) {
-    return res.send('You do not have access to this link');
+    return res.status(401).send('Error 401! You do not have access to this link.');
   }
 
   urlDatabase[id].longURL = longURL;
@@ -293,16 +273,16 @@ app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.userID;
 
   if (!userID) {
-    return res.send('Please log in.');
+    return res.status(400).send(`Error 400! Please register or <a href="http://localhost:8080/login">log in</a>.`);
   }
 
 
   if (!urlDatabase[id]) {
-    return res.status(404).send('Error: URL does not exist');
+    return res.status(404).send('Error 404! URL does not exist.');
   }
 
   if (urlDatabase[id].userID !== userID) {
-    return res.send('You do not have access to this link');
+    return res.status(401).send('Error 401! You do not have access to this link.');
   }
 
 
