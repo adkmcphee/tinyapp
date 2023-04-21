@@ -44,7 +44,7 @@ app.post("/urls", (req, res) => {
 
   if (!user) {
     return res.status(401).send('Error 401! Must be logged in to see this page.');
-  }
+  };
 
   urlDatabase[id] = {
     longURL: req.body.longURL,
@@ -86,7 +86,7 @@ app.post("/register", (req, res) => {
   
   if (!email || !password) {
     return res.status(400).send('Error 400! Please fill out both fields properly.');
-  }
+  };
   
   if (getUserByEmail(email, users)) {
     return res.status(400).send('Error 400! That email is already in use.');
@@ -117,7 +117,7 @@ app.get("/register", (req, res) => {
 
   if (user) {
     return res.redirect('/urls');
-  }
+  };
 
   const templateVars = {
     user: user
@@ -132,7 +132,7 @@ app.get("/login", (req, res) => {
   
   if (user) {
     return res.redirect('/urls');
-  }
+  };
   
   const templateVars = {
     user: user
@@ -147,7 +147,7 @@ app.get("/urls/new", (req, res) => {
 
   if (!user) {
     return res.redirect('/login');
-  }
+  };
 
   const templateVars = {
     user: user
@@ -161,7 +161,7 @@ app.get("/u/:id", (req, res) => {
 
   if (!urlDatabase[id]) {
     return res.status(404).send('Error 404! URL does not exist.');
-  }
+  };
 
   res.redirect(urlDatabase[id].longURL);
 });
@@ -173,15 +173,15 @@ app.get("/urls/:id", (req, res) => {
 
   if (!user) {
     return res.status(401).send('Error 401! Please log in.');
-  }
+  };
 
   if (!urlDatabase[id]) {
     return res.status(404).send('Error 404! URL does not exist.');
-  }
+  };
 
   if (urlDatabase[id].userID !== userID) {
     return res.status(401).send('Error 401! You do not have access to this link.');
-  }
+  };
 
   const templateVars = {
     id: id,
@@ -198,7 +198,7 @@ app.get("/urls", (req, res) => {
 
   if (!user) {
     return res.status(400).send(`Error 400! Please <a href="http://localhost:8080/register">register</a> or <a href="http://localhost:8080/login">log in</a>.`);
-  }
+  };
   let userUrlsDatabase = urlsForUser(userID, urlDatabase);
 
   const templateVars = {
@@ -227,15 +227,15 @@ app.post("/urls/:id", (req, res) => {
 
   if (!user) {
     return res.status(400).send('Error 400! Please register or log in.');
-  }
+  };
 
   if (!urlDatabase[id]) {
     return res.status(404).send('Error 404! URL does not exist.');
-  }
+  };
 
   if (urlDatabase[id].userID !== userID) {
     return res.status(401).send('Error 401! You do not have access to this link.');
-  }
+  };
 
   urlDatabase[id].longURL = longURL;
 
@@ -254,15 +254,15 @@ app.post("/urls/:id/delete", (req, res) => {
 
   if (!user) {
     return res.status(400).send(`Error 400! Please register or <a href="http://localhost:8080/login">log in</a>.`);
-  }
+  };
 
   if (!urlDatabase[id]) {
     return res.status(404).send('Error 404! URL does not exist.');
-  }
+  };
 
   if (urlDatabase[id].userID !== userID) {
     return res.status(401).send('Error 401! You do not have access to this link.');
-  }
+  };
 
   delete (urlDatabase[id]);
 
