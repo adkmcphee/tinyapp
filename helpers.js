@@ -7,6 +7,19 @@ function getUserByEmail(email, database) {
   }
   return null;
 }
+function generateRandomString() {
+  return Math.random().toString(36).substring(2, 8);
+};
+
+function urlsForUser(id, urlDatabase) {
+  let userUrlDatabase = {};
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userUrlDatabase[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userUrlDatabase;
+};
 
 
-module.exports = {getUserByEmail}
+module.exports = {getUserByEmail, generateRandomString, urlsForUser}
